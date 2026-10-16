@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Appointment Details{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-clipboard-check"></i> Appointment Details</h2>
+
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Patient Information</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Name:</strong> {{ appointment.patient.name }}</p>
+                <p><strong>Phone:</strong> {{ appointment.patient.phone }}</p>
+                <p><strong>Blood Group:</strong> {{ appointment.patient.blood_group }}</p>
+                <p><strong>Date of Birth:</strong> {{ appointment.patient.date_of_birth.strftime('%d-%m-%Y') if
+                    appointment.patient.date_of_birth }}</p>
+                <p><strong>Address:</strong> {{ appointment.patient.address }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Appointment Information</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Date:</strong> {{ appointment.appointment_date.strftime('%d-%m-%Y') }}</p>
+                <p><strong>Time:</strong> {{ appointment.time_slot }}</p>
+                <p><strong>Status:</strong>
+                    <span
+                        class="badge bg-{{ 'success' if appointment.status == 'Completed' else 'primary' if appointment.status == 'Booked' else 'secondary' }}">
+                        {{ appointment.status }}
+                    </span>
+                </p>
+                <p><strong>Booked on:</strong> {{ appointment.created_at.strftime('%d-%m-%Y %H:%M') }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if appointment.status == 'Booked' %}
+<div class="card mb-3">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0">Complete Appointment</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST">
+            <input type="hidden" name="action" value="complete">
+            <div class="mb-3">
+                <label class="form-label">Diagnosis *</label>
+                <textarea class="form-control" name="diagnosis" rows="3" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Prescription *</label>
+                <textarea class="form-control" name="prescription" rows="3" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Notes</label>
+                <textarea class="form-control" name="notes" rows="2"></textarea>
+            </div>
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-check-circle"></i> Mark as Completed
+            </button>
+        </form>
+    </div>
+</div>
+
+<form method="POST" onsubmit="return confirm('Are you sure you want to cancel this appointment?')">
+    <input type="hidden" name="action" value="cancel">
+    <button type="submit" class="btn btn-danger">
+        <i class="bi bi-x-circle"></i> Cancel Appointment
+    </button>
+</form>
+{% endif %}
+
+{% if appointment.treatment %}
+<div class="card mt-3">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0">Treatment Details</h5>
+    </div>
+    <div class="card-body">
+        <p><strong>Diagnosis:</strong> {{ appointment.treatment.diagnosis }}</p>
+        <p><strong>Prescription:</strong> {{ appointment.treatment.prescription }}</p>
+        <p><strong>Notes:</strong> {{ appointment.treatment.notes }}</p>
+        <p><strong>Date:</strong> {{ appointment.treatment.created_at.strftime('%d-%m-%Y %H:%M') }}</p>
+    </div>
+</div>
+{% endif %}
+
+<h4 class="mt-4 mb-3">Patient History</h4>
+<div class="card">
+    <div class="card-body">
+        {% if patient_history %}
+        <div class="table-responsive">
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Diagnosis</th>
+                        <th>Prescription</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for past_appt in patient_history %}
+                    {% if past_appt.treatment %}
+                    <tr>
+                        <td>{{ past_appt.appointment_date.strftime('%d-%m-%Y') }}</td>
+                        <td>{{ past_appt.treatment.diagnosis }}</td>
+                        <td>{{ past_appt.treatment.prescription }}</td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted text-center">No previous history</p>
+        {% endif %}
+    </div>
+</div>
+
+<a href="{{ url_for('doctor_dashboard') }}" class="btn btn-secondary mt-3">
+    <i class="bi bi-arrow-left"></i> Back to Dashboard
+</a>
+{% endblock %}

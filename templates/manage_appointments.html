@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Appointments{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-calendar3"></i> All Appointments</h2>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Patient</th>
+                        <th>Doctor</th>
+                        <th>Department</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appointment in appointments %}
+                    <tr>
+                        <td>{{ appointment.id }}</td>
+                        <td>{{ appointment.patient.name }}</td>
+                        <td>{{ appointment.doctor.name }}</td>
+                        <td>{{ appointment.doctor.department.name }}</td>
+                        <td>{{ appointment.appointment_date.strftime('%d-%m-%Y') }}</td>
+                        <td>{{ appointment.time_slot }}</td>
+                        <td>
+                            {% if appointment.status == 'Booked' %}
+                            <span class="badge bg-primary">{{ appointment.status }}</span>
+                            {% elif appointment.status == 'Completed' %}
+                            <span class="badge bg-success">{{ appointment.status }}</span>
+                            {% else %}
+                            <span class="badge bg-secondary">{{ appointment.status }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

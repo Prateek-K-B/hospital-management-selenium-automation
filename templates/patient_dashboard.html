@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Patient Dashboard{% endblock %}
+
+{% block content %}
+<div class="card bg-primary text-white mb-4">
+    <div class="card-body">
+        <h2><i class="bi bi-person-circle me-2"></i>Welcome, {{ patient.name }}!</h2>
+        <p class="mb-0">Your health is our priority. Book appointments and manage your healthcare.</p>
+    </div>
+</div>
+
+{% if upcoming_appointments %}
+<h4 class="mb-3">Your Next Appointment</h4>
+{% for appt in upcoming_appointments[:1] %}
+<div class="card mb-4">
+    <div class="card-body">
+        <h5><i class="bi bi-calendar-check me-2"></i>Upcoming Visit</h5>
+        <p class="mb-2">
+            <i class="bi bi-calendar3 me-2"></i><strong>Date:</strong> {{ appt.appointment_date.strftime('%d %B, %Y')
+            }}<br>
+            <i class="bi bi-clock me-2"></i><strong>Time:</strong> {{ appt.time_slot }}<br>
+            <i class="bi bi-person-badge me-2"></i><strong>Doctor:</strong> {{ appt.doctor.name }}<br>
+            <i class="bi bi-hospital me-2"></i><strong>Department:</strong> {{ appt.doctor.department.name }}
+        </p>
+        <a href="{{ url_for('cancel_appointment', appointment_id=appt.id) }}" class="btn btn-sm btn-danger"
+            onclick="return confirm('Cancel this appointment?')">
+            Cancel Appointment
+        </a>
+    </div>
+</div>
+{% endfor %}
+{% endif %}
+
+<h4 class="mb-3">Browse by Specialization</h4>
+
+<div class="row g-3">
+    {% for dept in departments %}
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="bi bi-hospital-fill text-primary" style="font-size: 2.5rem;"></i>
+                <h5 class="mt-3">{{ dept.name }}</h5>
+                <p class="text-muted">{{ dept.description }}</p>
+                <a href="{{ url_for('browse_doctors', department_id=dept.id) }}" class="btn btn-primary btn-sm">
+                    View Doctors
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

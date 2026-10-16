@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Profile{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-person-circle"></i> Edit Profile</h2>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="name" class="form-label">Full Name *</label>
+                            <input type="text" class="form-control" id="name" name="name" value="{{ patient.name }}"
+                                required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="phone" class="form-label">Phone *</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" value="{{ patient.phone }}"
+                                required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Address</label>
+                        <textarea class="form-control" id="address" name="address"
+                            rows="2">{{ patient.address }}</textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="dob" class="form-label">Date of Birth</label>
+                            <input type="date" class="form-control" id="dob" name="dob"
+                                value="{{ patient.date_of_birth.strftime('%Y-%m-%d') if patient.date_of_birth }}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="blood_group" class="form-label">Blood Group</label>
+                            <select class="form-select" id="blood_group" name="blood_group">
+                                <option value="">Select...</option>
+                                <option value="A+" {% if patient.blood_group=='A+' %}selected{% endif %}>A+</option>
+                                <option value="A-" {% if patient.blood_group=='A-' %}selected{% endif %}>A-</option>
+                                <option value="B+" {% if patient.blood_group=='B+' %}selected{% endif %}>B+</option>
+                                <option value="B-" {% if patient.blood_group=='B-' %}selected{% endif %}>B-</option>
+                                <option value="AB+" {% if patient.blood_group=='AB+' %}selected{% endif %}>AB+</option>
+                                <option value="AB-" {% if patient.blood_group=='AB-' %}selected{% endif %}>AB-</option>
+                                <option value="O+" {% if patient.blood_group=='O+' %}selected{% endif %}>O+</option>
+                                <option value="O-" {% if patient.blood_group=='O-' %}selected{% endif %}>O-</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle"></i> Update Profile
+                    </button>
+                    <a href="{{ url_for('patient_dashboard') }}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

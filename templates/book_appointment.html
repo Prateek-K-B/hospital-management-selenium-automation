@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Book Appointment{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-calendar-plus"></i> Book Appointment</h2>
+
+<div class="row">
+    <div class="col-md-4 mb-3">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Doctor Information</h5>
+            </div>
+            <div class="card-body">
+                <h5>{{ doctor.name }}</h5>
+                <p class="mb-1"><strong>Specialization:</strong> {{ doctor.department.name }}</p>
+                <p class="mb-1"><strong>Qualification:</strong> {{ doctor.qualification }}</p>
+                <p class="mb-1"><strong>Experience:</strong> {{ doctor.experience_years }} years</p>
+                <p class="mb-1"><strong>Phone:</strong> {{ doctor.phone }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Select Date & Time</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Select Date *</label>
+                        <select class="form-select" name="appointment_date" id="dateSelect" required
+                            onchange="updateTimeSlots()">
+                            <option value="">Choose a date...</option>
+                            {% for day_info in next_7_days %}
+                            {% if day_info.slots %}
+                            <option value="{{ day_info.date.strftime('%Y-%m-%d') }}"
+                                data-slots='{{ day_info.slots|tojson }}'>
+                                {{ day_info.date.strftime('%A, %d %B %Y') }} ({{ day_info.slots|length }} slots
+                                available)
+                            </option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3" id="timeSlotsContainer" style="display: none;">
+                        <label class="form-label">Select Time Slot *</label>
+                        <div id="timeSlotsList"></div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success btn-lg w-100" id="submitBtn" disabled>
+                        <i class="bi bi-check-circle"></i> Confirm Booking
+                    </button>
+                </form>
+
+                {% if next_7_days|selectattr('slots')|list|length == 0 %}
+                <div class="alert alert-warning mt-3">
+                    This doctor has no available slots in the next 7 days. Please check back later or choose another
+                    doctor.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<a href="{{ url_for('browse_doctors') }}" class="btn btn-secondary mt-3">
+    <i class="bi bi-arrow-left"></i> Back to Doctors
+</a>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function updateTimeSlots() {
+        const dateSelect = document.getElementById('dateSelect');
+        const selectedOption = dateSelect.options[dateSelect.selectedIndex];
+        const slotsContainer = document.getElementById('timeSlotsContainer');
+        const slotsList = document.getElementById('timeSlotsList');
+        const submitBtn = document.getElementById('submitBtn');
+
+        if (selectedOption.value) {
+            const slots = JSON.parse(selectedOption.getAttribute('data-slots'));
+
+            let html = '<div class="row">';
+            slots.forEach((slot, index) => {
+                html += `
+                <div class="col-md-6 mb-2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="time_slot" value="${slot}" 
+                               id="slot_${index}" required onchange="enableSubmit()">
+                        <label class="form-check-label" for="slot_${index}">
+                            ${slot}
+                        </label>
+                    </div>
+                </div>
+            `;
+            });
+            html += '</div>';
+
+            slotsList.innerHTML = html;
+            slotsContainer.style.display = 'block';
+        } else {
+            slotsContainer.style.display = 'none';
+            submitBtn.disabled = true;
+        }
+    }
+
+    function enableSubmit() {
+        document.getElementById('submitBtn').disabled = false;
+    }
+</script>
+{% endblock %}

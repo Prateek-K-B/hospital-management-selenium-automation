@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Browse Doctors{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-search"></i> Find Doctors</h2>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET">
+            <div class="row">
+                <div class="col-md-5 mb-3">
+                    <label class="form-label">Filter by Department</label>
+                    <select class="form-select" name="department_id" onchange="this.form.submit()">
+                        <option value="">All Departments</option>
+                        {% for dept in departments %}
+                        <option value="{{ dept.id }}" {% if selected_department==dept.id|string %}selected{% endif %}>
+                            {{ dept.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-5 mb-3">
+                    <label class="form-label">Search by Name</label>
+                    <input type="text" class="form-control" name="q" value="{{ search_query }}"
+                        placeholder="Doctor name or specialization">
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">&nbsp;</label>
+                    <button type="submit" class="btn btn-primary w-100">Search</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<h4 class="mb-3">Available Doctors ({{ doctors|length }})</h4>
+<div class="row">
+    {% for doctor in doctors %}
+    <div class="col-md-6 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ doctor.name }}</h5>
+                <p class="mb-1"><strong>Specialization:</strong> {{ doctor.department.name }}</p>
+                <p class="mb-1"><strong>Qualification:</strong> {{ doctor.qualification }}</p>
+                <p class="mb-1"><strong>Experience:</strong> {{ doctor.experience_years }} years</p>
+                <p class="mb-1"><strong>Phone:</strong> {{ doctor.phone }}</p>
+                <a href="{{ url_for('book_appointment', doctor_id=doctor.id) }}" class="btn btn-primary btn-sm mt-2">
+                    <i class="bi bi-calendar-plus"></i> Book Appointment
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if doctors|length == 0 %}
+<div class="alert alert-info">
+    No doctors found. Try adjusting your search criteria.
+</div>
+{% endif %}
+{% endblock %}

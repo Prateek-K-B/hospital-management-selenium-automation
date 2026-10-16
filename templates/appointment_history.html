@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}My Appointments{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-clock-history"></i> My Appointment History</h2>
+
+<div class="card">
+    <div class="card-body">
+        {% if appointments %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Doctor</th>
+                        <th>Department</th>
+                        <th>Status</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appt in appointments %}
+                    <tr>
+                        <td>{{ appt.appointment_date.strftime('%d-%m-%Y') }}</td>
+                        <td>{{ appt.time_slot }}</td>
+                        <td>{{ appt.doctor.name }}</td>
+                        <td>{{ appt.doctor.department.name }}</td>
+                        <td>
+                            <span
+                                class="badge bg-{{ 'success' if appt.status == 'Completed' else 'primary' if appt.status == 'Booked' else 'secondary' }}">
+                                {{ appt.status }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if appt.treatment %}
+                            <button class="btn btn-sm btn-info" data-bs-toggle="modal"
+                                data-bs-target="#treatmentModal{{ appt.id }}">
+                                View Treatment
+                            </button>
+
+                            <!-- Treatment Modal -->
+                            <div class="modal fade" id="treatmentModal{{ appt.id }}" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Treatment Details</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p><strong>Date:</strong> {{ appt.appointment_date.strftime('%d-%m-%Y') }}
+                                            </p>
+                                            <p><strong>Doctor:</strong> {{ appt.doctor.name }}</p>
+                                            <hr>
+                                            <p><strong>Diagnosis:</strong></p>
+                                            <p>{{ appt.treatment.diagnosis }}</p>
+                                            <p><strong>Prescription:</strong></p>
+                                            <p>{{ appt.treatment.prescription }}</p>
+                                            {% if appt.treatment.notes %}
+                                            <p><strong>Notes:</strong></p>
+                                            <p>{{ appt.treatment.notes }}</p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted text-center">No appointments yet. <a href="{{ url_for('browse_doctors') }}">Book your first
+                appointment!</a></p>
+        {% endif %}
+    </div>
+</div>
+
+<a href="{{ url_for('patient_dashboard') }}" class="btn btn-secondary mt-3">
+    <i class="bi bi-arrow-left"></i> Back to Dashboard
+</a>
+{% endblock %}
